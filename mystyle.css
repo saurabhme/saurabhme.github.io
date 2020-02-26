@@ -1,0 +1,103 @@
+body {
+  margin: 0 auto;
+  max-width: 50em;
+  padding: 2em 2em;
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.5;
+}
+
+div.box {
+  padding: 1em 1em 1em 1em;
+  border-bottom: 3px dashed lightgray;
+}
+
+div.footer {
+  border-top: 1px solid black;
+}
+
+hr {
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  border-bottom: 3px dashed lightgray;
+}
+
+p.footer {
+  font-size: small;
+  text-align: center;
+}
+
+ul.authors {
+  padding-left: 10px;
+  list-style-type: none;
+}
+
+ul.grants {
+  padding-left: 10px;
+}
+
+section ul li {
+  margin: 0 0 1.5em 0;
+  line-height: 0.8;
+}
+
+section ul li cite {
+  font-style: normal;
+  padding: none;
+  font-size: 0.9em;
+}
+
+section ul li p {
+  font-size: 0.8em;
+  font-style: italic;
+  padding: none;
+}
+
+.profilepic {
+  float: right;
+  width: 15em;
+  padding-left: 2em;
+
+}
+
+.profilepic img {
+  width: 100%;
+}
+
+.hiddenData {
+  display: none;
+}
+
+#primarycontent a:link {
+  color: #009;
+  text-decoration: none;
+}
+
+#primarycontent a:visited {
+  color: #00F;
+  text-decoration: none;
+  /*color: #8d9345; */
+}
+
+#primarycontent a:hover {
+  text-decoration: underline;
+}
+
+#primarycontent {
+  max-width: 800px;
+  width: expression(document.body.clientWidth > 800? "800px": "auto");
+  text-align: justify;
+  margin-left: auto;
+  margin-right: auto;
+  color: black;
+  font-family: Arial, sans-serif;
+  font-style: normal;
+  font-weight: normal;
+  font-size: 0.9em;
+}
+
+#primarycontent h3 {
+  text-align: left;
+  padding: 0 0 0.2em 0.5em;
+  margin: 1em 0 0 0;
+}

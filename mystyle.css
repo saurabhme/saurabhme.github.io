@@ -50,7 +50,13 @@ section ul li cite {
 section ul li p {
   font-size: 0.8em;
   font-style: italic;
+  color: #666666;
   padding: none;
+}
+
+section ul li p span.venue {
+  color: #444444;
+  font-weight: bold;
 }
 
 .profilepic {
@@ -62,6 +68,7 @@ section ul li p {
 
 .profilepic img {
   width: 100%;
+  border-radius: 1.5em;
 }
 
 .hiddenData {

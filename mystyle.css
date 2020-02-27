@@ -54,6 +54,10 @@ section ul li p {
   padding: none;
 }
 
+section ul li a {
+  font-style: normal;
+}
+
 section ul li p span.venue {
   color: #444444;
   font-weight: bold;
@@ -69,6 +73,7 @@ section ul li p span.venue {
 .profilepic img {
   width: 100%;
   border-radius: 1.5em;
+  box-shadow: 0.2em 0.2em 0.1em grey;
 }
 
 .hiddenData {

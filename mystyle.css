@@ -71,6 +71,11 @@ section ul li p span.venue {
   font-weight: bold;
 }
 
+section ul li p span.me {
+  color: #666666;
+  font-weight: bolder;
+}
+
 .profilepic {
   float: right;
   width: 12em;

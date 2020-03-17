@@ -76,6 +76,11 @@ section ul li p span.me {
   font-weight: bolder;
 }
 
+section ul li p a.author {
+  color: #666666;
+  font-style: italic;
+}
+
 .profilepic {
   float: right;
   width: 12em;

@@ -46,7 +46,7 @@ ul.grants {
 
 section ul li {
   margin: 0 0 1.5em 0;
-  line-height: 0.8;
+  line-height: 0.9em;
 }
 
 section ul li cite {
@@ -60,10 +60,22 @@ section ul li p {
   font-style: italic;
   color: #666666;
   padding: none;
+  margin-top: 0.4em;
+  margin-bottom: 0.4em;
 }
 
 section ul li a {
   font-style: normal;
+}
+
+section ul li cite span.new {
+  color: #FFFFFF;
+  font-weight: lighter;
+  font-size: small;
+  background-color: red;
+  border-radius: 0.2em;
+  padding-right: 0.2em;
+  padding-left: 0.2em;
 }
 
 section ul li p span.venue {
@@ -72,7 +84,7 @@ section ul li p span.venue {
 }
 
 section ul li p span.me {
-  color: #666666;
+  color: #444444;
   font-weight: bolder;
 }
 

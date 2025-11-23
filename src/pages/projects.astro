@@ -1,0 +1,36 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ThreeScene from '../components/ThreeScene.jsx';
+---
+
+<Layout title="Projects - Saurabh Singh">
+    <section>
+        <h1 class="text-4xl font-extrabold tracking-tight mb-8">Projects & Apps</h1>
+        <p class="text-lg text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] mb-12">
+            A collection of web applications, experiments, and visualizations.
+        </p>
+
+        <div class="grid grid-cols-1 gap-12">
+            <!-- Project 1: Vibecoded Demo -->
+            <div class="border border-[var(--color-border)] dark:border-[var(--color-border-dark)] rounded-2xl overflow-hidden bg-[var(--color-bg)] dark:bg-[var(--color-bg-dark)] shadow-sm hover:shadow-md transition-shadow">
+                <div class="p-6 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+                    <h2 class="text-2xl font-bold mb-2">Vibecoded 3D Demo</h2>
+                    <p class="text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
+                        An interactive 3D scene built with React Three Fiber. Click the shape to expand it!
+                    </p>
+                </div>
+                <div class="p-0">
+                    <ThreeScene client:load />
+                </div>
+            </div>
+
+            <!-- Placeholder for future projects -->
+            <!-- 
+            <div class="border border-[var(--color-border)] dark:border-[var(--color-border-dark)] rounded-2xl p-6">
+                <h2 class="text-2xl font-bold mb-2">Project Name</h2>
+                <p class="text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">Description...</p>
+            </div> 
+            -->
+        </div>
+    </section>
+</Layout>

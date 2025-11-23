@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Background: Dark rounded square -->
+  <rect x="0" y="0" width="128" height="128" rx="24" fill="#1e293b" />
+  
+  <!-- Text: p(x) in LaTeX-like font (Times New Roman Italic) -->
+  <text x="64" y="84" font-family="'Times New Roman', Times, serif" font-style="italic" font-weight="bold" font-size="72" text-anchor="middle" fill="#ffffff">p(x)</text>
+</svg>

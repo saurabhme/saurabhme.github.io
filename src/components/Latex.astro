@@ -1,0 +1,28 @@
+---
+import katex from 'katex';
+
+interface Props {
+	formula: string;
+	inline?: boolean;
+    className?: string;
+}
+
+const { formula, inline = false, className = "" } = Astro.props;
+
+const html = katex.renderToString(formula, {
+	throwOnError: false,
+    displayMode: !inline,
+});
+---
+
+<span class:list={["latex-container", className]} set:html={html} />
+
+<style>
+    .latex-container {
+        display: inline-block;
+    }
+    /* Override KaTeX font size to match parent if needed */
+    :global(.katex) {
+        font-size: 1.1em;
+    }
+</style>

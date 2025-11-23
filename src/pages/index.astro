@@ -1,0 +1,131 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+
+import { Mail, GraduationCap, Twitter } from 'lucide-react';
+import Latex from '../components/Latex.astro';
+import BibTexToggle from '../components/BibTexToggle.jsx';
+
+
+const publications = [
+  {
+    title: "Discretized Approximate Ancestral Sampling",
+    authors: "Alfredo De la Fuente, Saurabh Singh, Johannes Ballé",
+    venue: "Learn to Compress Workshop, ISIT 2025",
+    link: "https://arxiv.org/abs/2505.06098",
+    isNew: true,
+    bibtex: `@inproceedings{delafuente2025discretized,
+  title={Discretized Approximate Ancestral Sampling},
+  author={De la Fuente, Alfredo and Singh, Saurabh and Ballé, Johannes},
+  booktitle={Learn to Compress Workshop, ISIT},
+  year={2025}
+}`
+  },
+  {
+    title: "Stochastic Sampling from Deterministic Flow Models",
+    authors: "Saurabh Singh, Ian Fischer",
+    venue: "arXiv 2024",
+    link: "https://arxiv.org/abs/2410.02217",
+    isNew: true,
+    bibtex: `@article{singh2024stochastic,
+  title={Stochastic Sampling from Deterministic Flow Models},
+  author={Singh, Saurabh and Fischer, Ian},
+  journal={arXiv preprint arXiv:2410.02217},
+  year={2024}
+}`
+  },
+  {
+    title: "Fourier Head: Helping Large Language Models Learn Complex Probability Distributions",
+    authors: "Nate Gillman, Daksh Aggarwal, Michael Freeman, Saurabh Singh, Chen Sun",
+    venue: "ICLR 2025",
+    link: "https://arxiv.org/abs/2410.22269",
+    isNew: true,
+    bibtex: `@inproceedings{gillman2025fourier,
+  title={Fourier Head: Helping Large Language Models Learn Complex Probability Distributions},
+  author={Gillman, Nate and Aggarwal, Daksh and Freeman, Michael and Singh, Saurabh and Sun, Chen},
+  booktitle={International Conference on Learning Representations},
+  year={2025}
+}`
+  },
+  {
+    title: "Fourier Basis Density Model",
+    authors: "Alfredo De la Fuente, Saurabh Singh, Johannes Ballé",
+    venue: "PCS 2024",
+    award: "Best Paper Award",
+    link: "https://arxiv.org/abs/2402.15345",
+    isNew: true,
+    bibtex: `@inproceedings{delafuente2024fourier,
+  title={Fourier Basis Density Model},
+  author={De la Fuente, Alfredo and Singh, Saurabh and Ballé, Johannes},
+  booktitle={Picture Coding Symposium},
+  year={2024}
+}`
+  }
+];
+---
+
+<Layout title="Saurabh Singh - Research Scientist">
+	<section class="mb-12">
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="flex-1">
+                <h1 class="text-4xl font-extrabold tracking-tight mb-4">Saurabh Singh</h1>
+                <p class="text-lg text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] leading-relaxed mb-6">
+                    I am a Senior Research Scientist at Google, working in the field of Computer Vision and Machine Learning.
+                    I received my PhD in Computer Science from University of Illinois at Urbana-Champaign, where I was advised by Prof. David Forsyth and Prof. Derek Hoiem.
+                    I received my MS from Robotics Institute, Carnegie Mellon University where I worked with Alyosha Efros, Abhinav Gupta and Martial Hebert.
+                </p>
+                <p class="text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
+                    I frequently serve as an area chair or reviewer at leading computer vision and ML conferences, including CVPR, ICCV, ECCV, ICLR and NeurIPS.
+                </p>
+                
+                <div class="flex gap-4 mt-6">
+                    <a href="mailto:saurabh.me@gmail.com" class="p-3 bg-[var(--color-primary)] text-white rounded-full hover:opacity-90 transition-opacity" aria-label="Email Me">
+                        <Mail className="w-5 h-5" />
+                    </a>
+                    <a href="https://scholar.google.com/citations?user=L7fTK1MAAAAJ&hl=en" target="_blank" class="p-3 border border-[var(--color-border)] dark:border-[var(--color-border-dark)] rounded-full hover:bg-[var(--color-bg-dark)] hover:text-white transition-colors" aria-label="Google Scholar">
+                        <GraduationCap className="w-5 h-5" />
+                    </a>
+                    <a href="https://twitter.com/saurasingh" target="_blank" class="p-3 border border-[var(--color-border)] dark:border-[var(--color-border-dark)] rounded-full hover:bg-[var(--color-bg-dark)] hover:text-white transition-colors" aria-label="Twitter">
+                        <Twitter className="w-5 h-5" />
+                    </a>
+                </div>
+            </div>
+            <div class="w-full md:w-1/3 shrink-0">
+                <img src="/images/me.jpg" alt="Saurabh Singh" class="rounded-2xl shadow-lg w-full max-w-[300px] mx-auto md:mx-0 hover:scale-105 transition-transform duration-300" />
+            </div>
+        </div>
+	</section>
+
+
+
+    <section>
+        <h2 class="text-2xl font-bold mb-6 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)] pb-2">Selected Publications</h2>
+        <ul class="space-y-6">
+            {publications.map((pub) => (
+                <li class="group">
+                    <div class="flex items-baseline gap-2">
+                        <a href={pub.link} target="_blank" class="text-lg font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:underline">
+                            {pub.title}
+                        </a>
+                        {pub.isNew && <span class="text-xs font-bold font-mono bg-red-600 text-white px-1.5 py-0.5 rounded">NEW</span>}
+                        {pub.award && <span class="text-xs font-bold font-mono bg-amber-500 text-white px-1.5 py-0.5 rounded">{pub.award}</span>}
+                    </div>
+                    <p class="text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] mt-1">
+                        {pub.authors}
+                    </p>
+                    <div class="flex flex-wrap items-baseline gap-2 mt-1">
+                        <p class="text-xs font-bold font-mono text-[var(--color-text)] dark:text-[var(--color-text-dark)]">
+                            {pub.venue}
+                        </p>
+                        {pub.bibtex && <BibTexToggle client:load bibtex={pub.bibtex} />}
+                    </div>
+                </li>
+            ))}
+        </ul>
+        <div class="mt-8 text-center">
+            <a href="https://scholar.google.com/citations?user=L7fTK1MAAAAJ&hl=en" class="text-[var(--color-primary)] hover:underline font-medium">
+                View all publications on Google Scholar &rarr;
+            </a>
+        </div>
+    </section>
+</Layout>

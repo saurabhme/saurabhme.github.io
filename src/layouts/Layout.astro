@@ -1,0 +1,53 @@
+---
+import '../styles/global.css';
+
+interface Props {
+	title: string;
+	description?: string;
+}
+
+const { title, description = "Saurabh Singh - Research Scientist" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="description" content={description} />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		
+        <!-- Fonts -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono&display=swap" rel="stylesheet">
+        
+        <!-- KaTeX CSS for Math -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css" integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI+WdtXRGWt2kTvGFasHpSy3SV" crossorigin="anonymous">
+
+		<title>{title}</title>
+	</head>
+	<body class="antialiased">
+        <nav class="py-6 border-b border-[var(--color-border)] dark:border-[var(--color-border-dark)] mb-8">
+            <div class="container flex justify-between items-center">
+                <div class="font-bold text-xl tracking-tight">
+                    <!-- Logo/Name removed for cleaner look -->
+                </div>
+                <div class="flex gap-6 text-sm font-medium">
+                    <a href="/" class="hover:text-[var(--color-primary)] transition-colors">Home</a>
+                    <a href="/blog" class="hover:text-[var(--color-primary)] transition-colors">Blog</a>
+                    <a href="/projects" class="hover:text-[var(--color-primary)] transition-colors">Projects</a>
+                </div>
+            </div>
+        </nav>
+
+		<main class="container flex-1">
+			<slot />
+		</main>
+
+        <footer class="py-8 mt-12 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)] text-center text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
+            <p>&copy; {new Date().getFullYear()} Saurabh Singh. All rights reserved.</p>
+        </footer>
+	</body>
+</html>

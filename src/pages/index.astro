@@ -5,7 +5,7 @@ import Layout from '../layouts/Layout.astro';
 import { Mail, GraduationCap, Twitter } from 'lucide-react';
 import Latex from '../components/Latex.astro';
 import BibTexToggle from '../components/BibTexToggle.jsx';
-
+import Bio from '../components/Bio.astro';
 
 const publications = [
   {
@@ -69,14 +69,7 @@ const publications = [
         <div class="flex flex-col md:flex-row gap-8 items-start">
             <div class="flex-1">
                 <h1 class="text-4xl font-extrabold tracking-tight mb-4">Saurabh Singh</h1>
-                <p class="text-lg text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] leading-relaxed mb-6">
-                    I am a Senior Research Scientist at Google, working in the field of Computer Vision and Machine Learning.
-                    I received my PhD in Computer Science from University of Illinois at Urbana-Champaign, where I was advised by Prof. David Forsyth and Prof. Derek Hoiem.
-                    I received my MS from Robotics Institute, Carnegie Mellon University where I worked with Alyosha Efros, Abhinav Gupta and Martial Hebert.
-                </p>
-                <p class="text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
-                    I frequently serve as an area chair or reviewer at leading computer vision and ML conferences, including CVPR, ICCV, ECCV, ICLR and NeurIPS.
-                </p>
+                <Bio />
                 
                 <div class="flex gap-4 mt-6">
                     <a href="mailto:saurabh.me@gmail.com" class="p-3 bg-[var(--color-primary)] text-white rounded-full hover:opacity-90 transition-opacity" aria-label="Email Me">

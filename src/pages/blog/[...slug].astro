@@ -15,16 +15,19 @@ const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-	<article class="prose dark:prose-invert max-w-none">
-        <header class="mb-8 not-prose">
-            <h1 class="text-4xl font-extrabold tracking-tight mb-2">{post.data.title}</h1>
-            <p class="text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
-                {post.data.pubDate.toLocaleDateString('en-us', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                })}
-            </p>
+	<article class="prose prose-lg dark:prose-invert max-w-[85ch] mx-auto font-serif text-justify leading-relaxed prose-headings:font-bold prose-headings:text-[var(--color-text)] dark:prose-headings:text-[var(--color-text-dark)] prose-a:text-[var(--color-primary)] dark:prose-a:text-[var(--color-primary-dark)] hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-lg">
+        <header class="mb-10 not-prose text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 font-sans text-[var(--color-text)] dark:text-[var(--color-text-dark)]">{post.data.title}</h1>
+            <div class="flex flex-col items-center gap-2 text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] font-mono text-sm uppercase tracking-wider">
+                <p>{post.data.author}</p>
+                <p>
+                    {post.data.pubDate.toLocaleDateString('en-us', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                    })}
+                </p>
+            </div>
         </header>
         <div class="blog-content">
 		    <Content />

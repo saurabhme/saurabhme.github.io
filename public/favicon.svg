@@ -1,7 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <style>
+    @font-face {
+      font-family: 'KaTeX_Main';
+      src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Main-Regular.woff2') format('woff2');
+    }
+    @font-face {
+      font-family: 'KaTeX_Math';
+      src: url('https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/fonts/KaTeX_Math-Italic.woff2') format('woff2');
+    }
+    .math-text {
+      font-family: 'KaTeX_Math', 'Times New Roman', serif;
+      font-style: italic;
+      font-weight: bold;
+    }
+  </style>
+  
   <!-- Background: Dark rounded square -->
   <rect x="0" y="0" width="128" height="128" rx="24" fill="#1e293b" />
   
-  <!-- Text: p(x) in LaTeX-like font (Times New Roman Italic) -->
-  <text x="64" y="84" font-family="'Times New Roman', Times, serif" font-style="italic" font-weight="bold" font-size="72" text-anchor="middle" fill="#ffffff">p(x)</text>
+  <!-- Text: p(x) -->
+  <text x="64" y="82" font-size="64" text-anchor="middle" fill="#ffffff" class="math-text">p(x)</text>
 </svg>

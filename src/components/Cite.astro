@@ -1,0 +1,100 @@
+---
+interface Props {
+  id: number | string;
+}
+
+const { id } = Astro.props;
+---
+
+<a href={`#ref-${id}`} 
+   class="citation-link text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:underline no-underline select-none relative"
+   data-id={id}>
+    <sup class="font-mono text-[0.7em] font-bold">[{id}]</sup>
+</a>
+
+<script>
+    let tooltip: HTMLElement | null = null;
+
+    function createTooltip() {
+        if (tooltip) return;
+        tooltip = document.createElement('div');
+        tooltip.className = 'fixed hidden max-w-sm p-3 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg shadow-xl border border-slate-200 dark:border-slate-700 z-50 pointer-events-none transition-opacity duration-200 opacity-0';
+        tooltip.style.backdropFilter = 'blur(8px)';
+        document.body.appendChild(tooltip);
+    }
+
+    function showTooltip(e: MouseEvent, id: string) {
+        if (!tooltip) createTooltip();
+        if (!tooltip) return;
+
+        const refEl = document.getElementById(`ref-${id}`);
+        if (!refEl) return;
+
+        // Clone content to avoid modifying original
+        const content = refEl.cloneNode(true) as HTMLElement;
+        // Remove the numbering span if possible
+        const numberSpan = content.querySelector('span');
+        if (numberSpan) numberSpan.remove();
+        
+        tooltip.innerHTML = content.innerHTML.trim();
+        tooltip.classList.remove('hidden');
+        
+        // Small delay to allow transition
+        requestAnimationFrame(() => {
+            if (tooltip) tooltip.classList.remove('opacity-0');
+        });
+
+        updatePosition(e);
+    }
+
+    function hideTooltip() {
+        if (!tooltip) return;
+        tooltip.classList.add('opacity-0');
+        setTimeout(() => {
+            if (tooltip) tooltip.classList.add('hidden');
+        }, 200);
+    }
+
+    function updatePosition(e: MouseEvent) {
+        if (!tooltip || tooltip.classList.contains('hidden')) return;
+        
+        const offset = 10;
+        const x = e.clientX + offset;
+        const y = e.clientY + offset;
+        
+        // Boundary checks
+        const rect = tooltip.getBoundingClientRect();
+        const winWidth = window.innerWidth;
+        const winHeight = window.innerHeight;
+        
+        let finalX = x;
+        let finalY = y;
+
+        if (x + rect.width > winWidth) finalX = e.clientX - rect.width - offset;
+        if (y + rect.height > winHeight) finalY = e.clientY - rect.height - offset;
+
+        tooltip.style.left = `${finalX}px`;
+        tooltip.style.top = `${finalY}px`;
+    }
+
+    // Initialize
+    document.addEventListener('astro:page-load', () => {
+        // Re-attach listeners on navigation
+        setupListeners();
+    });
+
+    // Initial setup
+    setupListeners();
+
+    function setupListeners() {
+        const links = document.querySelectorAll('.citation-link');
+        links.forEach(link => {
+            const id = link.getAttribute('data-id');
+            if (!id) return;
+
+            link.addEventListener('mouseenter', (e) => showTooltip(e as MouseEvent, id));
+            link.addEventListener('mouseleave', hideTooltip);
+            link.addEventListener('mousemove', (e) => updatePosition(e as MouseEvent));
+        });
+    }
+</script>

@@ -32,5 +32,19 @@ const { Content } = await post.render();
         <div class="blog-content">
 		    <Content />
         </div>
+
+        {post.data.references && post.data.references.length > 0 && (
+            <div class="mt-16 pt-8 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+                <h2 class="text-xl font-bold mb-4 font-sans uppercase tracking-wide text-[var(--color-text)] dark:text-[var(--color-text-dark)]">References</h2>
+                <ul class="list-none space-y-2 text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
+                    {post.data.references.map((ref, index) => (
+                        <li id={`ref-${index + 1}`} class="pl-8 -indent-8 scroll-mt-24 transition-colors duration-300 target:bg-yellow-50 dark:target:bg-yellow-900/20 target:rounded-lg target:p-2 target:-ml-2">
+                            <span class="font-mono text-xs text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] mr-2">[{index + 1}]</span>
+                            {ref}
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        )}
 	</article>
 </Layout>

@@ -3,13 +3,18 @@ title: "You Do You, Just Bound the Likelihood"
 description: "A derivation showing that predicting clean data, noise, or velocity are all reparameterizations of the same Latent Stochastic Interpolants objective."
 pubDate: "2025-11-24"
 author: "Saurabh Singh"
+references:
+  - "Li, X., & He, K. (2025). Back to Basics: Let Denoising Generative Models Denoise. arXiv preprint arXiv:2505.xxxxx."
+  - "Singh, S., & Lagun, D. (2025). Latent Stochastic Interpolants. arXiv preprint arXiv:2501.xxxxx."
 ---
+
+import Cite from "../../components/Cite.astro";
 
 ## Introduction
 
-The paper _"Back to Basics: Let Denoising Generative Models Denoise"_ (Li & He, 2025) argues that predicting clean data ($x$) is fundamentally superior to predicting noise ($\epsilon$) or velocity ($v$) due to manifold assumptions. They propose "Just Image Transformers" (JiT) operating directly on pixels/patches.
+The paper _"Back to Basics: Let Denoising Generative Models Denoise"_ <Cite id={1} /> argues that predicting clean data ($x$) is fundamentally superior to predicting noise ($\epsilon$) or velocity ($v$) due to manifold assumptions. They propose "Just Image Transformers" (JiT) operating directly on pixels/patches.
 
-We assert that this formulation is not a distinct paradigm but rather a specific instantiation of the **Latent Stochastic Interpolants (LSI)** framework (Singh & Lagun, 2025), where the latent mapping is restricted to a deterministic identity. By deriving the Evidence Lower Bound (ELBO) under these constraints, we show that $x$, $v$, and $\epsilon$ prediction are merely reparameterizations of the same likelihood bound, and the empirical differences arise from implicit loss weighting rather than manifold alignment.
+We assert that this formulation is not a distinct paradigm but rather a specific instantiation of the **Latent Stochastic Interpolants (LSI)** framework <Cite id={2} />, where the latent mapping is restricted to a deterministic identity. By deriving the Evidence Lower Bound (ELBO) under these constraints, we show that $x$, $v$, and $\epsilon$ prediction are merely reparameterizations of the same likelihood bound, and the empirical differences arise from implicit loss weighting rather than manifold alignment.
 
 ## Unifying Formulation
 

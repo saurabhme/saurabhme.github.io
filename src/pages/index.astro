@@ -97,11 +97,11 @@ const publications = [
             {publications.map((pub) => (
                 <li class="group">
                     <div class="flex items-baseline gap-2">
-                        <a href={pub.link} target="_blank" class="text-lg font-semibold text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:underline">
+                        <a href={pub.link} target="_blank" class="text-lg font-serif font-medium text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:underline decoration-1 underline-offset-2">
                             {pub.title}
                         </a>
-                        {pub.isNew && <span class="text-xs font-bold font-mono bg-red-600 text-white px-1.5 py-0.5 rounded">NEW</span>}
-                        {pub.award && <span class="text-xs font-bold font-mono bg-amber-500 text-white px-1.5 py-0.5 rounded">{pub.award}</span>}
+                        {pub.isNew && <span class="text-[10px] font-bold font-mono text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 px-1.5 py-0.5 rounded uppercase tracking-wider">NEW</span>}
+                        {pub.award && <span class="text-[10px] font-bold font-mono text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 px-1.5 py-0.5 rounded uppercase tracking-wider">{pub.award}</span>}
                     </div>
                     <p class="text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] mt-1">
                         {pub.authors}

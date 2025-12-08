@@ -12,6 +12,7 @@ const blog = defineCollection({
     heroImage: z.string().optional(),
     author: z.string().default('Saurabh Singh'),
     references: z.array(z.string()).optional(),
+    draft: z.boolean().optional(),
   }),
 });
 

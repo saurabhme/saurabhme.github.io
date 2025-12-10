@@ -1,18 +1,38 @@
 ---
-
+const linkClass =
+  "text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] hover:underline";
 ---
 
 <div class="bio-content">
   <p
     class="text-lg text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] leading-relaxed mb-6"
   >
-    I am a Founding Research Scientist at Poetiq, working on all things AI.
-    Earlier, I was a Research Scientist at Google DeepMind, where I worked on
-    Learned Compression and Generative Models. I received my PhD in Computer
-    Science from University of Illinois at Urbana-Champaign, where I was advised
-    by Prof. David Forsyth and Prof. Derek Hoiem. I received my MS from Robotics
-    Institute, Carnegie Mellon University where I worked with Alyosha Efros,
-    Abhinav Gupta, and Martial Hebert.
+    I am a Founding Research Scientist at <a
+      href="https://poetiq.ai"
+      target="_blank"
+      class={linkClass}>Poetiq</a
+    >, working on all things AI. Earlier, I was a Research Scientist at Google
+    DeepMind, where I worked on Learned Compression and Generative Models. I
+    received my PhD in Computer Science from University of Illinois at
+    Urbana-Champaign, where I was advised by
+    <a href="http://luthuli.cs.uiuc.edu/~daf/" target="_blank" class={linkClass}
+      >Prof. David Forsyth</a
+    > and
+    <a href="https://dhoiem.cs.illinois.edu/" target="_blank" class={linkClass}
+      >Prof. Derek Hoiem</a
+    >. I received my MS from Robotics Institute, Carnegie Mellon University
+    where I worked with
+    <a
+      href="https://people.eecs.berkeley.edu/~efros/"
+      target="_blank"
+      class={linkClass}>Alyosha Efros</a
+    >,
+    <a href="http://www.cs.cmu.edu/~abhinavg/" target="_blank" class={linkClass}
+      >Abhinav Gupta</a
+    >, and
+    <a href="http://www.cs.cmu.edu/~hebert/" target="_blank" class={linkClass}
+      >Martial Hebert</a
+    >.
   </p>
   <p
     class="text-lg text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] leading-relaxed"

@@ -1,0 +1,194 @@
+---
+title: "You Do You, Just Bound the Likelihood"
+draft: true
+description:
+  "A derivation showing that predicting clean data, noise, or velocity are all
+  reparameterizations of the same Latent Stochastic Interpolants objective."
+pubDate: "2025-11-24"
+author: "Saurabh Singh"
+references:
+  - "Li, X., & He, K. (2025). Back to Basics: Let Denoising Generative Models
+    Denoise. arXiv preprint arXiv:2505.xxxxx."
+  - "Singh, S., & Lagun, D. (2025). Latent Stochastic Interpolants. arXiv
+    preprint arXiv:2501.xxxxx."
+---
+
+import Cite from "../../components/Cite.astro";
+
+## Introduction
+
+The paper _"Back to Basics: Let Denoising Generative Models Denoise"_
+
+<Cite id={1} /> argues that predicting clean data ($x$) is fundamentally superior
+to predicting noise ($\epsilon$) or velocity ($v$) due to manifold assumptions. They
+propose "Just Image Transformers" (JiT) operating directly on pixels/patches.
+
+We assert that this formulation is not a distinct paradigm but rather a specific
+instantiation of the **Latent Stochastic Interpolants (LSI)** framework
+
+<Cite id={2} />, where the latent mapping is restricted to a deterministic
+identity. By deriving the Evidence Lower Bound (ELBO) under these constraints,
+we show that $x$, $v$, and $\epsilon$ prediction are merely reparameterizations
+of the same likelihood bound, and the empirical differences arise from implicit
+loss weighting rather than manifold alignment.
+
+## Unifying Formulation
+
+We adopt the notation from _LSI_:
+
+- Let $x_1$ denote the observed data (pixels).
+- Let $z_1$ denote the latent representation at time $t=1$.
+- Let $z_0$ denote the prior at time $t=0$, assumed to be Gaussian
+  $z_0 \sim \mathcal{N}(0, I)$ (matching the BtB assumption).
+- Let $z_t$ be the stochastic interpolant between $z_0$ and $z_1$.
+
+### The LSI Evidence Lower Bound
+
+The core contribution of LSI is the derivation of an ELBO for dynamical systems
+governed by stochastic interpolants. From **Eq. (3)** in _lsi.pdf_, the ELBO is
+given by:
+
+$$
+\ln p_\theta(x_1) \ge \mathbb{E}_{q(z_1|x_1)} \left[ \ln p_\theta(x_1|z_1) - \mathbb{E}_{z_t} \left[ \int_0^1 \frac{1}{2} ||u(z_t, t)||^2 dt \right] \right]
+$$
+
+Here, $u(z_t, t)$ is the vector field that satisfies the matching condition
+$\sigma_t u(z_t, t) = h_\phi(z_t, t) - h_\theta(z_t, t)$, where $h_\phi$ is the
+drift of the variational posterior and $h_\theta$ is the learnable model drift.
+
+### Collapsing the Latent Space (The BtB Assumption)
+
+The _Back to Basics_ paper operates directly on patches of pixels without a
+learned VAE. In the LSI framework, this is equivalent to defining the encoder
+$q(z_1|x_1)$ and decoder $p_\theta(x_1|z_1)$ as deterministic, invertible
+mappings (e.g., identity or patch flattening).
+
+Let us define:
+
+$$
+q(z_1|x_1) = \delta(z_1 - x_1)
+$$
+
+$$
+p_\theta(x_1|z_1) = \delta(x_1 - z_1)
+$$
+
+This implies $z_1 \equiv x_1$.
+
+### Deriving the Deterministic Bound
+
+Substituting these Dirac distributions into the ELBO:
+
+1. **The Reconstruction Term**: The term
+   $\mathbb{E}_{q(z_1|x_1)} [\ln p_\theta(x_1|z_1)]$ becomes constant (or
+   infinite but constant with respect to generative parameters) because the
+   reconstruction is perfect and deterministic. It can be ignored during
+   optimization of the generative model.
+
+2. **The Generative Term**: With $z_1 = x_1$, the ELBO simplifies to:
+
+$$
+\mathcal{L}_{ELBO} \approx - \mathbb{E}_{x_1, z_0, t} \left[ \frac{1}{2} ||u(z_t, t)||^2 \right] + \text{const}
+$$
+
+We assume the linear stochastic interpolant used in both papers
+($\kappa_t=t, \nu_t=1-t$). From **Eq. (15)** in _lsi.pdf_, the target field
+$u(z_t, t)$ for this interpolant is:
+
+$$
+u(z_t, t) = \sigma^{-1} \left[ -\sigma \sqrt{\frac{t}{1-t}}\epsilon + z_1 - z_0 - h_\theta(z_t, t) \right]
+$$
+
+Substituting $z_1 = x$ (clean data) and $z_0 = \epsilon$ (noise), we obtain the
+general LSI loss for the deterministic model:
+
+$$
+\mathcal{L} = \mathbb{E} \left[ \frac{1}{2\sigma^2} \left|\left| -\sigma \sqrt{\frac{t}{1-t}}\epsilon + x - \epsilon - h_\theta(z_t, t) \right|\right|^2 \right]
+$$
+
+## Equivalence of Prediction Objectives
+
+The _Back to Basics_ paper posits that predicting $x$ (clean data) is
+fundamentally distinct from predicting $\epsilon$ (noise) or $v$ (velocity).
+However, using the LSI ELBO derived above, we demonstrate that these are merely
+algebraic reparameterizations of the **same** optimization objective, differing
+only by a time-dependent weighting coefficient.
+
+### $x$-prediction (Denoising)
+
+The "denoising" objective favored by BtB corresponds to the **Denoising
+Parameterization** in LSI (Appendix A.3).
+
+We parameterize the drift $h_\theta$ in terms of a clean data predictor network
+$\hat{x}_\theta(z_t, t)$ using the relationship
+$h_\theta(z_t, t) = \frac{\hat{x}_\theta(z_t, t) - z_t}{1-t}$.
+
+Substituting this into the LSI objective (specifically **Eq. 39** in _lsi.pdf_),
+the objective becomes:
+
+$$
+\mathcal{L}_x = \mathbb{E} \left[ \frac{1}{2(1-t)^2} || x - \hat{x}_\theta(z_t, t) ||^2 \right]
+$$
+
+This reveals that $x$-prediction is simply optimizing the ELBO with a weighting
+schedule of $\lambda_t = \frac{1}{2(1-t)^2}$. The LSI framework confirms this is
+a valid maximization of the likelihood bound.
+
+### $\epsilon$-prediction (Noise Prediction)
+
+The standard diffusion objective corresponds to the **NoisePred
+Parameterization** in LSI (Appendix A.4).
+
+We parameterize the drift in terms of a noise predictor network
+$\hat{\epsilon}_\theta(z_t, t)$. Following the exact derivation in **Eq. (46)**
+of _lsi.pdf_, the objective takes the form:
+
+$$
+\mathcal{L}_\epsilon = \mathbb{E} \left[ \frac{\sigma^2 t + 1 - t}{2 t^2(1-t)} || \epsilon - \hat{\epsilon}_\theta(z_t, t) ||^2 \right]
+$$
+
+Here, the implicit weighting schedule behaves approximately as
+$\lambda_t \propto t^{-2}$ near $t=0$ and $\lambda_t \propto (1-t)^{-1}$ near
+$t=1$. This recovers the standard noise-prediction loss, showing it optimizes
+the same bound but with heavy emphasis on the noise end of the schedule
+($t \to 0$).
+
+### $v$-prediction (Velocity)
+
+The velocity prediction objective corresponds to the **OrigFlow**
+parameterization in LSI (Appendix A.1).
+
+Using the derivation in **Eq. (24)** of _lsi.pdf_, the objective is:
+
+$$
+\mathcal{L}_v = \mathbb{E} \left[ \frac{1}{2\sigma^2(1-t)} || \underbrace{\sqrt{1-t}(x - \epsilon) - \sigma\sqrt{t}\epsilon}_{\text{Target}(z_t)} - \hat{v}_\theta(z_t, t) ||^2 \right]
+$$
+
+Here, the network $\hat{v}_\theta$ predicts a target that is dominated by the
+velocity term $\sqrt{1-t}(x - \epsilon)$. Crucially, the weighting coefficient
+is $\lambda_t = \frac{1}{2\sigma^2(1-t)}$. This demonstrates that stochastic
+velocity prediction essentially optimizes the ELBO with a weighting of
+$\propto (1-t)^{-1}$. This places higher emphasis on the data end of the
+trajectory ($t \to 1$) compared to the noise end, similar to $x$-prediction but
+with a lower-order pole ($(1-t)^{-1}$ vs $(1-t)^{-2}$).
+
+## Conclusion
+
+The "Just Image Transformers" (JiT) approach proposed in _Back to Basics_ is
+effectively a special case of **Latent Stochastic Interpolants (LSI)** where the
+encoder and decoder are set to identity functions.
+
+Our derivation proves that the objectives for predicting clean data ($x$), noise
+($\epsilon$), and velocity ($v$) all originate from the **same Evidence Lower
+Bound**. The performance gap observed in _Back to Basics_ is not due to manifold
+fundamentals, but rather due to the specific implicit weightings and
+singularities imposed by the ELBO:
+
+- **x-pred:** Weight has a pole at $t=1$ ($\propto (1-t)^{-2}$).
+- **$\epsilon$-pred:** Weight has a pole at $t=0$ ($\propto t^{-2}$).
+- **v-pred:** Weight has a pole at $t=1$ ($\propto (1-t)^{-1}$).
+
+LSI provides the theoretical unification that explains why $x$-prediction
+performs best: it aligns the optimization focus (via the stronger weighting
+pole) with the region where the signal is strongest ($t \to 1$), whereas
+$v$-prediction uses a weaker weighting for that same region.

@@ -1,0 +1,288 @@
+---
+title: "From Chaos to Order: Unifying REINFORCE and Evolutionary Strategies"
+draft: true
+description: "Relating REINFORCE and Evolutionary Strategies."
+pubDate: "2025-12-7"
+author: "Saurabh Singh"
+references:
+  - "REINFORCE: Williams, R. J. (1992). Learning in reinforcement learning.
+    Machine Learning, 8(3), 229-256."
+  - "Evolutionary Strategies: OPENAI"
+---
+
+import Cite from "../../components/Cite.astro";
+
+## Introduction
+
+In the landscape of stochastic optimization, few algorithms are as fundamental
+as REINFORCE and Evolutionary Strategies (ES). Often treated as distinct—one the
+hammer of Reinforcement Learning, the other a gradient-free optimizer for
+"black-box" functions—they are, at a fundamental level, manifestations of the
+same principle.
+
+For a physicist, this connection is intuitive: it is the relationship between
+microscopic thermal fluctuations and macroscopic drift. Today, we will derive
+the ES gradient estimator through two distinct lenses: first as a rigorous
+application of REINFORCE, and second via local perturbation analysis (Taylor
+expansion).
+
+## 1. The REINFORCE Gradient: A Primer
+
+Let us first rigorously define the REINFORCE gradient (Williams, 1992). Consider
+a generic maximization problem where we wish to maximize an expectation over a
+distribution parameterized by $\theta$:
+
+$$
+J(\theta) = \mathbb{E}_{x \sim p_\theta(x)} [R(x)] = \int p_\theta(x) R(x) dx
+$$
+
+where $R(x)$ is a reward or score function (which need not be differentiable),
+and $p_\theta(x)$ is a probability density function.
+
+To optimize $J(\theta)$, we seek the gradient $\nabla_\theta J(\theta)$.
+Assuming we can exchange the derivative and the integral (Leibniz integral
+rule), we proceed as follows:
+
+$$
+\nabla_\theta J(\theta) = \nabla_\theta \int p_\theta(x) R(x) dx = \int \nabla_\theta p_\theta(x) R(x) dx
+$$
+
+Using the "log-derivative trick" (essentially the identity
+$\nabla_\theta p = p \nabla_\theta \log p$):
+
+$$
+\nabla_\theta p_\theta(x) = p_\theta(x) \nabla_\theta \log p_\theta(x)
+$$
+
+Substituting this back into the integral, we recover the standard REINFORCE
+estimator:
+
+$$
+\nabla_\theta J(\theta) = \int p_\theta(x) \nabla_\theta \log p_\theta(x) R(x) dx = \mathbb{E}_{x \sim p_\theta} [R(x) \nabla_\theta \log p_\theta(x)]
+$$
+
+This result is powerful because it requires only the score function $R(x)$ and
+the score of the density $\nabla_\theta \log p_\theta(x)$, avoiding the need for
+$\nabla_x R(x)$.
+
+## 2. The Variational Perspective: ES is REINFORCE
+
+Now, let us see how Evolutionary Strategies is simply a special case of the
+framework above. In ES, we do not optimize $F(\theta)$ directly. Instead, we
+optimize a "Gaussian-smoothed" objective:
+
+$$
+J_{ES}(\theta) = \mathbb{E}_{\psi \sim \mathcal{N}(\theta, \sigma^2 I)} [F(\psi)]
+$$
+
+Here, $\psi$ is a perturbed parameter vector and $F(\psi)$ is the "hard"
+objective. To derive the gradient, we map the components to the REINFORCE
+framework:
+
+- The "Action" $x$ becomes the parameters $\psi$.
+
+- The "Policy" $p_\theta(x)$ becomes the search distribution
+  $p(\psi | \theta) = \mathcal{N}(\psi; \theta, \sigma^2 I)$.
+
+- The "Reward" $R(x)$ becomes the function value $F(\psi)$.
+
+Applying the REINFORCE identity:
+
+$$
+\nabla_\theta J_{ES}(\theta) = \mathbb{E}_{\psi \sim \mathcal{N}(\theta, \sigma^2 I)} [F(\psi) \nabla_\theta \log p(\psi | \theta)]
+$$
+
+The log-likelihood of the Gaussian is
+$\log p \propto -\frac{1}{2\sigma^2} \|\psi - \theta\|^2$. Its gradient with
+respect to the mean $\theta$ is:
+
+$$
+\nabla_\theta \log p(\psi | \theta) = \frac{1}{\sigma^2} (\psi - \theta)
+$$
+
+Using the reparameterization trick $\psi = \theta + \epsilon$ where
+$\epsilon \sim \mathcal{N}(0, \sigma^2 I)$, we arrive at the standard ES
+estimator:
+
+$$
+\nabla_\theta J_{ES}(\theta) = \mathbb{E}_{\epsilon} \left[ F(\theta + \epsilon) \frac{\epsilon}{\sigma^2} \right]
+$$
+
+This derivation confirms that ES is simply REINFORCE where the "policy" is the
+parameter generator itself.
+
+## 3. The Perturbation Perspective: A Taylor Expansion
+
+While the REINFORCE derivation is elegant, it can feel abstract. A more
+mechanical justification—one that highlights _why_ noise estimates a
+gradient—comes from a simple Taylor expansion.
+
+Consider a 1D function $F(\theta)$ (the logic holds for multivariate). We
+perturb $\theta$ by noise $\epsilon \sim \mathcal{N}(0, \sigma^2)$. We can
+approximate $F$ locally:
+
+$$
+F(\theta + \epsilon) \approx F(\theta) + F'(\theta)\epsilon + \frac{1}{2}F''(\theta)\epsilon^2
+$$
+
+Now, consider the expectation of the product of the noise $\epsilon$ and the
+perturbed function value (the numerator of our ES estimator):
+
+$$
+\mathbb{E}[\epsilon F(\theta + \epsilon)] \approx \mathbb{E}\left[ \epsilon \left( F(\theta) + F'(\theta)\epsilon + \frac{1}{2}F''(\theta)\epsilon^2 \right) \right]
+$$
+
+By linearity of expectation, we analyze term by term:
+
+1. $\mathbb{E}[\epsilon F(\theta)] = F(\theta)\mathbb{E}[\epsilon] = 0$ (since
+   mean is 0)
+
+2. $\mathbb{E}[\epsilon (F'(\theta)\epsilon)] = F'(\theta)\mathbb{E}[\epsilon^2] = F'(\theta)\sigma^2$
+
+3. $\mathbb{E}[\epsilon (\frac{1}{2}F''(\theta)\epsilon^2)] = \frac{1}{2}F''(\theta)\mathbb{E}[\epsilon^3] = 0$
+   (skewness of Gaussian is 0)
+
+Thus, we are left with:
+
+$$
+\mathbb{E}[\epsilon F(\theta + \epsilon)] \approx F'(\theta)\sigma^2 \implies F'(\theta) \approx \frac{1}{\sigma^2}\mathbb{E}[\epsilon F(\theta + \epsilon)]
+$$
+
+This recovers the exact same estimator as the REINFORCE derivation! This
+perspective is powerful because it reveals that **ES is essentially a stochastic
+finite-difference method** that uses the variance of the noise ($\sigma^2$) to
+probe the slope ($F'$).
+
+## 4. The "Free Lunch": Second-Order Information
+
+One of the most compelling insights from the perturbation view is that we are
+not limited to the gradient. Since we have already evaluated
+$F(\theta+\epsilon)$, can we extract curvature (Hessian) information without
+extra function calls?
+
+Revisiting our Taylor expansion, look at the expectation of
+$(\epsilon^2 - \sigma^2) F(\theta + \epsilon)$. The first-order term vanishes
+because $\mathbb{E}[\epsilon^3]=0$. The second-order term, however, involves
+$\mathbb{E}[\epsilon^4]$ (the kurtosis).
+
+For a Gaussian, $\mathbb{E}[\epsilon^4] = 3\sigma^4$. It can be shown that:
+
+$$
+\mathbb{E}\left[ \left(\frac{\epsilon^2}{\sigma^2} - 1\right) F(\theta + \epsilon) \right] \approx \sigma^2 F''(\theta)
+$$
+
+This implies we can estimate the diagonal of the Hessian **using the exact same
+samples** used for the gradient. In physics terms, if the gradient is the dipole
+moment of the perturbation, the Hessian is the quadrupole moment.
+
+## Conclusion
+
+We have bridged two worlds:
+
+1. **Probabilistic:** ES is REINFORCE applied to a Gaussian policy over
+   parameters.
+
+2. **Deterministic:** ES is a smoothed finite-difference approximation via
+   Taylor expansion.
+
+This duality explains its robustness. By smoothing the landscape (convolving $F$
+with a Gaussian), ES trades the bias of not optimizing $F$ directly for the
+ability to ignore high-frequency noise and non-differentiable singularities. It
+turns the chaos of high-dimensional optimization into an ordered, smooth
+descent.
+
+# Appendix: The Geometry of Gaussian Evolution
+
+## 1. The Fisher Information Matrix (FIM)
+
+In Information Geometry, the parameter space of a probability distribution is
+treated as a Riemannian manifold. The metric tensor for this manifold is the
+Fisher Information Matrix $F(\theta)$:
+
+$$
+F(\theta) = \mathbb{E}_{x \sim p_\theta} \left[ \nabla_\theta \log p_\theta(x) \left( \nabla_\theta \log p_\theta(x) \right)^T \right]
+$$
+
+This matrix measures the local curvature of the KL-divergence. Steepest ascent
+in this Riemannian space is given by the **Natural Gradient**:
+
+$$
+\tilde{\nabla}_\theta J = F(\theta)^{-1} \nabla_\theta J
+$$
+
+## 2. Derivation for the Multivariate Gaussian
+
+Let our policy be $p_\theta(x) = \mathcal{N}(x | \mu, \Sigma)$. The parameters
+are $\theta = [\mu, \Sigma]$. The log-likelihood is:
+
+$$
+\log p_\theta(x) = -\frac{d}{2}\log(2\pi) - \frac{1}{2}\log|\Sigma| - \frac{1}{2}(x - \mu)^T \Sigma^{-1} (x - \mu)
+$$
+
+### Part A: The Mean Parameter $\mu$
+
+First, we find the score function with respect to the mean $\mu$:
+
+$$
+\nabla_\mu \log p_\theta(x) = \Sigma^{-1}(x - \mu)
+$$
+
+Now, we calculate the Fisher Information block corresponding to $\mu$, denoted
+$F_\mu$:
+
+$$
+F_\mu = \mathbb{E} \left[ \left( \Sigma^{-1}(x - \mu) \right) \left( \Sigma^{-1}(x - \mu) \right)^T \right]
+$$
+
+$$
+F_\mu = \Sigma^{-1} \mathbb{E} \left[ (x - \mu)(x - \mu)^T \right] \Sigma^{-T}
+$$
+
+Since $\mathbb{E} [(x - \mu)(x - \mu)^T]$ is exactly the definition of the
+covariance $\Sigma$:
+
+$$
+F_\mu = \Sigma^{-1} \Sigma \Sigma^{-1} = \Sigma^{-1}
+$$
+
+**The Natural Gradient Update for** $\mu$**:**
+
+$$
+\tilde{\nabla}_\mu J = F_\mu^{-1} \nabla_\mu J = \Sigma \nabla_\mu J
+$$
+
+This is a profound result. In standard Euclidean gradient descent, the update is
+$\mu \leftarrow \mu + \alpha \nabla_\mu J$. In Natural Evolution Strategies, the
+update becomes $\mu \leftarrow \mu + \alpha \Sigma \nabla_\mu J$.
+
+### Part B: Connection to the Hessian
+
+Why does multiplying by $\Sigma$ resemble second-order optimization?
+
+Consider a quadratic objective function (a local Taylor expansion of our fitness
+landscape) near the optimum:
+
+$$
+f(x) \approx -\frac{1}{2} (x - x^*)^T H (x - x^*)
+$$
+
+where $H$ is the Hessian (positive definite for a maximum).
+
+In this landscape, the optimal search distribution (the one maximizing average
+fitness entropy-regularized) will align its covariance with the shape of the
+peak. specifically, the optimal covariance satisfies $\Sigma \propto H^{-1}$.
+
+If the algorithm effectively adapts $\Sigma$ to match the inverse Hessian of the
+landscape (which NES does), then the update for the mean becomes:
+
+$$
+\mu_{new} \leftarrow \mu + \alpha \Sigma \nabla_\mu J \approx \mu + \alpha H^{-1} \nabla_\mu J
+$$
+
+This recovers **Newton's Method**.
+
+Therefore, by doing steepest ascent on the statistical manifold (changing $\mu$
+and $\Sigma$), Natural ES implicitly performs a quasi-Newton optimization on the
+objective function $f(x)$. The covariance matrix $\Sigma$ acts as a learned
+preconditioner, dynamically estimating the inverse Hessian $H^{-1}$ from the
+history of function evaluations.

@@ -83,21 +83,149 @@ become non-crossing straight lines, minimizing the transport cost.
 
 ## $1$-Rectified Flows are special case of Flow models
 
-TODO: A brief description of how $1$-Rectified Flows are special case of Flow
-models. The papers to refer are "FLOW MATCHING FOR GENERATIVE MODELING" (Lipman
-et al.) and "Improving and Generalizing Flow-Based Generative Models with
-Minibatch Optimal Transport" (Tong et al.). From these papers, the rectified
-flow training objective can be derived as a special case.
+Both Flow Matching (Lipman et al., 2023) and Rectified Flows propose to regress
+a vector field $v(x_t, t)$ to a target vector field $u_t(x_t)$ that generates a
+probability path $p_t(x)$. The general Flow Matching objective is:
 
-## 2 Gaussian Special Case for Rectified Flow
+$$
+\mathcal{L}_{FM} = \mathbb{E}_{t, x_t \sim p_t(x)} \| v(x_t, t) - u_t(x_t) \|^2
+$$
 
-TODO: Use the derivation from the "Stochastic Sampling from Deterministic Flow
-Models" (Singh et al.) to express the flow in closed form for mapping between 2
-Gaussian distributions. Visually show that the trajectories are not straight by
-plotting the trajectories between two 2d gaussian with different means and same
-variance.
+Since the marginal vector field $u_t(x)$ is generally intractable, Lipman et al.
+introduced **Conditional Flow Matching (CFM)**. Instead of matching the marginal
+field directly, we match the vector field of a conditional probability path
+$p_t(x|z)$ conditioned on a latent variable $z$. The CFM objective is:
+
+$$
+\mathcal{L}_{CFM} = \mathbb{E}_{t, q(z), x_t \sim p_t(x|z)} \| v(x_t, t) - u_t(x_t|z) \|^2
+$$
+
+If we choose the conditioning variable $z$ to be the data pair $(x_0, x_1)$, and
+define the conditional flow as the linear interpolation
+$x_t = t x_1 + (1-t) x_0$, then the conditional vector field is simply
+$u_t(x_t|x_0, x_1) = x_1 - x_0$. Substituting this into the CFM objective:
+
+$$
+\mathcal{L}_{RF} = \mathbb{E}_{t, p(x_0, x_1), x_t} \| v(x_t, t) - (x_1 - x_0) \|^2
+$$
+
+This recovers exactly the Rectified Flow objective.
+
+Tong et al. (2023) further generalized this in "Improving and Generalizing
+Flow-Based Generative Models with Minibatch Optimal Transport". They observed
+that while the marginal flows are equivalent, the choice of coupling
+$p(x_0, x_1)$ matters for training efficiency. Independent coupling (random
+pairs) corresponds to standard CFM/RF, while Optimal Transport couplings can
+lead to straighter paths and faster training—a concept closely related to the
+"Reflow" procedure in Rectified Flows.
+
+## Two Gaussian Special Case for Rectified Flow
+
+We consider the case where both source and target are Gaussian distributions
+with the same variance $\sigma^2 I$ but different means. Let
+$p_0 = \mathcal{N}(x; \mu_0, \sigma^2 I)$ and
+$p_1 = \mathcal{N}(x; \mu_1, \sigma^2 I)$. We assume the coupling is
+independent, meaning $p(x_0, x_1) = p_0(x_0) p_1(x_1)$.
+
+The interpolation state is $x_t = (1-t)x_0 + t x_1$. Since $x_0$ and $x_1$ are
+independent Gaussians, $x_t$ is also Gaussian:
+
+$$
+p_t(x_t) = \mathcal{N}(x_t; \mu_t, \sigma_t^2 I)
+$$
+
+where the mean evolves linearly as $\mu_t = (1-t)\mu_0 + t\mu_1$, but the
+variance evolves quadratically:
+
+$$
+\sigma_t^2 = (1-t)^2 \sigma^2 + t^2 \sigma^2 = (1 - 2t + 2t^2) \sigma^2
+$$
+
+Notice that the variance **dips** in the middle at $t=0.5$, reducing to
+$0.5\sigma^2$. The distribution contracts and then expands.
+
+The optimal vector field $v(x, t)$ for a 1-Rectified Flow is given by the
+conditional expectation $v(x,t) = \mathbb{E}[x_1 - x_0 | x_t = x]$. For Gaussian
+variables, this expectation is linear in $x$. Using standard properties of
+conditional Gaussians (see Singh et al., 2022), we can derive:
+
+$$
+v(x, t) = (\mu_1 - \mu_0) + \frac{2t - 1}{1 - 2t + 2t^2} (x - \mu_t)
+$$
+
+The first term $(\mu_1 - \mu_0)$ is the constant velocity of the mean. The
+second term is a time-dependent linear scaling that pushes particles towards the
+mean when $t < 0.5$ (contraction) and away from the mean when $t > 0.5$
+(expansion).
+
+Because of this second term, any particle not exactly on the line connecting the
+means will follow a **curved trajectory**.
+
+<div class="not-prose mb-8">
+  <div class="flex justify-center">
+    <img
+      src="../public/images/blog/rectified-flow/gaussian-trajectories.png"
+      alt="Curved trajectories in Rectified Flow between two Gaussians"
+      class="rounded-lg shadow-md border border-[var(--color-border)]"
+    />
+  </div>
+  <p class="text-sm text-center mt-2 text-[var(--color-secondary)]">
+    Figure: Trajectories of a 1-Rectified Flow between two 2D Gaussians. The
+    variance dip causes paths to bundle together in the middle.
+  </p>
+</div>
 
 ## Straight Trajectories for 2 Gaussian Special Case
 
-TODO: Derive the schedule that leads to straight trajectories for the 2 Gaussian
-Special Case.
+As we saw, the curvature arises from the time-dependent interpolation of the
+variance $\sigma_t^2$. For the trajectories to be straight in general, the
+vector field should not have the "breathing" term that depends on particle
+position $x$. This requires the coefficient of $(x - \mu_t)$ in the vector field
+to be zero.
+
+Let's assume a general schedule $x_t = \alpha_t x_1 + \beta_t x_0$, effectively
+interpolating the means as $\mu_t = \alpha_t \mu_1 + \beta_t \mu_0$. The
+variance of the interpolant is:
+
+$$
+\sigma_t^2 = (\alpha_t^2 + \beta_t^2) \sigma^2
+$$
+
+The vector field for this general schedule (again derived via conditional
+expectation for Gaussians) is:
+
+$$
+v(x, t) = \dot{\mu}_t + \frac{\dot{\sigma}_t}{\sigma_t} (x - \mu_t)
+$$
+
+For the trajectories to be straight lines parallel to the mean shift, we need
+the second term to vanish for all $x$. This implies $\dot{\sigma}_t = 0$,
+meaning the variance must be constant in time:
+
+$$
+\sigma_t^2 = (\alpha_t^2 + \beta_t^2) \sigma^2 = \text{const} = \sigma^2
+$$
+
+Thus, we require the schedule coefficients to lie on the unit circle:
+
+$$
+\alpha_t^2 + \beta_t^2 = 1
+$$
+
+This is satisfied by the trigonometric (or Variance Preserving) schedule widely
+used in Diffusion Models:
+
+$$
+\alpha_t = \sin(\frac{\pi t}{2}), \quad \beta_t = \cos(\frac{\pi t}{2})
+$$
+
+Under this schedule, $\sigma_t^2 = \sigma^2$ for all $t$, so
+$\dot{\sigma}_t = 0$. The vector field simplifies to $v(x, t) = \dot{\mu}_t$,
+which depends only on time. The particles move in unison, translating the
+distribution without expanding or contracting it, resulting in perfectly
+straight, parallel trajectories.
+
+This highlights a key insight: **Standard linear interpolation results in curved
+Rectified Flow paths because it fails to preserve the geometry (variance) of the
+independent coupling.** Preserving the variance via a spherical interpolation
+rectifies the flow 1-step.

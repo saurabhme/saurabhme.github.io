@@ -25,3 +25,6 @@ pnpm-debug.log*
 *.swp
 # drafts/
 .venv/
+# Vercel
+.vercel
+src/pages/api/auth/

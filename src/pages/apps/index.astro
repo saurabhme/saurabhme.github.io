@@ -1,0 +1,89 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getSession } from 'auth-astro/server';
+
+const session = await getSession(Astro.request);
+---
+
+<Layout title="Private Applications">
+  <div class="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between mb-12">
+      <div>
+        <h1 class="text-4xl font-bold text-zinc-900 dark:text-white mb-2 font-display">
+          Private Workspace
+        </h1>
+        <p class="text-zinc-500 dark:text-zinc-400">
+          Welcome back, {session?.user?.name || 'Saurabh'}. Select an application below.
+        </p>
+      </div>
+      <div>
+        <button id="logout" class="px-4 py-2 bg-red-50 text-red-600 dark:bg-red-500/10 dark:text-red-400 rounded-lg text-sm font-medium hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors">
+          Sign Out
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      
+      <!-- Portfolio App Card -->
+      <a href="/apps/portfolio" class="block group">
+        <div class="h-full p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group-hover:-translate-y-1">
+          <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-zinc-900 dark:text-white mb-2 font-display">Portfolio Tracker</h2>
+          <p class="text-zinc-500 dark:text-zinc-400">Track individual stocks and combined portfolio trajectories with predictive models.</p>
+        </div>
+      </a>
+
+      <!-- LLM Games Card -->
+      <a href="/apps/games" class="block group">
+        <div class="h-full p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group-hover:-translate-y-1">
+          <div class="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-zinc-900 dark:text-white mb-2 font-display">LLM Web Games</h2>
+          <p class="text-zinc-500 dark:text-zinc-400">Single-page experiments and interactive games powered by large language models.</p>
+        </div>
+      </a>
+
+      <!-- LLM Assistant Card -->
+      <a href="/apps/assistant" class="block group">
+        <div class="h-full p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group-hover:-translate-y-1">
+          <div class="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-zinc-900 dark:text-white mb-2 font-display">Agentic Assistant</h2>
+          <p class="text-zinc-500 dark:text-zinc-400">An interface to save notes and let an LLM agent process and act upon your thoughts.</p>
+        </div>
+      </a>
+
+      <!-- Obsidian Sync Card -->
+      <a href="/apps/notes" class="block group">
+        <div class="h-full p-6 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-sm hover:shadow-md transition-all group-hover:-translate-y-1">
+          <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 rounded-xl flex items-center justify-center mb-4">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <h2 class="text-xl font-semibold text-zinc-900 dark:text-white mb-2 font-display">Obsidian Sync</h2>
+          <p class="text-zinc-500 dark:text-zinc-400">Read private markdown notes from GitHub. Let the AI suggest edits and new concepts.</p>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+  <script>
+    const { signOut } = await import("auth-astro/client");
+    const loButton = document.getElementById("logout");
+    if (loButton) loButton.onclick = () => signOut();
+  </script>
+</Layout>

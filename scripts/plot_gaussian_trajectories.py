@@ -52,23 +52,35 @@ initial_points.append(mu0 + np.array([0, -2]))
 initial_points.append(mu0 + np.array([2, 0])) # Between means
 
 # Solve ODE for each point
+# Plot 1-sigma and 2-sigma covariance circles
+theta = np.linspace(0, 2*np.pi, 100)
+for mu, color, label_prefix in [(mu0, '#e74c3c', '$p_0$'), (mu1, '#2ecc71', '$p_1$')]:
+    # 1-sigma
+    x_circle = mu[0] + sigma * np.cos(theta)
+    y_circle = mu[1] + sigma * np.sin(theta)
+    plt.plot(x_circle, y_circle, color=color, linestyle='--', alpha=0.6)
+    
+    # 2-sigma
+    x_circle2 = mu[0] + 2 * sigma * np.cos(theta)
+    y_circle2 = mu[1] + 2 * sigma * np.sin(theta)
+    plt.plot(x_circle2, y_circle2, color=color, linestyle=':', alpha=0.4)
+    
+    # Mean marker
+    plt.plot(mu[0], mu[1], 'o', color=color, markersize=8, label=f'{label_prefix} ($\mu$)')
+
+# Solve ODE for each point
 for x0 in initial_points:
     sol = solve_ode(x0, steps=300)
-    plt.plot(sol[:, 0], sol[:, 1], 'b-', alpha=0.4, linewidth=1.5)
-
-# Plot means
-plt.plot(mu0[0], mu0[1], 'ro', markersize=10, label='$\mu_0$ (Start)')
-plt.plot(mu1[0], mu1[1], 'go', markersize=10, label='$\mu_1$ (End)')
-
+    plt.plot(sol[:, 0], sol[:, 1], color='#3498db', alpha=0.5, linewidth=1.5)
 # Draw the straight line connecting means for reference
 plt.plot([mu0[0], mu1[0]], [mu0[1], mu1[1]], 'k--', alpha=0.3, label='Line of Means')
 
 # Styling
-plt.title('1-Rectified Flow Trajectories (Two Gaussians)', fontsize=14)
-plt.xlabel('$x_1$')
-plt.ylabel('$x_2$')
-plt.grid(True, alpha=0.2)
-plt.legend()
+plt.title('1-Rectified Flow Trajectories (Two Gaussians)', fontsize=14, pad=15)
+plt.xlabel('$x_1$', fontsize=12)
+plt.ylabel('$x_2$', fontsize=12)
+plt.grid(True, linestyle=':', alpha=0.3)
+plt.legend(frameon=True, fontsize=10, loc='upper left')
 plt.tight_layout()
 
 # Save

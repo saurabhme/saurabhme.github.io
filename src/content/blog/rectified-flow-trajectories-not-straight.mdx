@@ -1,6 +1,6 @@
 ---
 title: "Rectified Flow Trajectories are not Straight"
-draft: true
+draft: false
 description: "A deep dive into the geometry of rectified flow trajectories."
 pubDate: "2025-12-09"
 author: "Saurabh Singh"
@@ -22,17 +22,15 @@ models and therefore there is no reason to expect that the trajectories would be
 straighter.
 
 Let's first review what rectified flows are and then we will see why the
-trajectories are not straight.
+trajectories are not straight and what we can do about that.
 
 ## Notation
 
-<!-- We will follow the notation from the paper STOCHASTIC SAMPLING FROM DETERMINISTIC FLOW MODELS (Singh et al., 2022). -->
-
-Throughout this work we use small Latin letters $t, x, y$ etc. to represent
-scalar and vector variables, $f, g$ etc. to represent functions, Greek letters
-$\alpha, \beta$ etc. to represent (hyper-)parameters, and capital letters $G$ to
-represent matrices. With a slight abuse of notation we use lower case letters
-$x$ to represent both the random variable and a particular value $x \sim p(x)$.
+We use small Latin letters $t, x, y$ etc. to represent scalar and vector
+variables, $f, g$ etc. to represent functions, Greek letters $\alpha, \beta$
+etc. to represent (hyper-)parameters, and capital letters $G$ to represent
+matrices. With a slight abuse of notation we use lower case letters $x$ to
+represent both the random variable and a particular value $x \sim p(x)$.
 Whenever unambiguous, we suppress the dependence of state $x_t$ on time $t$ as
 $x \equiv x_t$, and dependence of functions on state $x_t$ and time $t$ as
 $f \equiv f(x_t, t)$ to simplify notation.
@@ -164,7 +162,7 @@ means will follow a **curved trajectory**.
 <div class="not-prose mb-8">
   <div class="flex justify-center">
     <img
-      src="../public/images/blog/rectified-flow/gaussian-trajectories.png"
+      src="/images/blog/rectified-flow/gaussian-trajectories.png"
       alt="Curved trajectories in Rectified Flow between two Gaussians"
       class="rounded-lg shadow-md border border-[var(--color-border)]"
     />
@@ -175,7 +173,7 @@ means will follow a **curved trajectory**.
   </p>
 </div>
 
-## Straight Trajectories for 2 Gaussian Special Case
+## Straight Trajectories for the Two Gaussian Special Case
 
 As we saw, the curvature arises from the time-dependent interpolation of the
 variance $\sigma_t^2$. For the trajectories to be straight in general, the
@@ -229,3 +227,86 @@ This highlights a key insight: **Standard linear interpolation results in curved
 Rectified Flow paths because it fails to preserve the geometry (variance) of the
 independent coupling.** Preserving the variance via a spherical interpolation
 rectifies the flow 1-step.
+
+## Straight Trajectories with Different Variances
+
+What if the variances are different, i.e.,
+$p_0 = \mathcal{N}(\mu_0, \sigma_0^2 I)$ and
+$p_1 = \mathcal{N}(\mu_1, \sigma_1^2 I)$ with $\sigma_0 \neq \sigma_1$?
+
+We can derive the conditions for straight trajectories more rigorously using the
+general form of the optimal vector field. As shown in Appendix F of _Singh et
+al. (2022)_, the vector field for a Gaussian probability path
+$p_t(x) = \mathcal{N}(\mu_t, \sigma_t^2 I)$ is given by:
+
+$$
+v_t(x) = \dot{\mu}_t + \frac{\dot{\sigma}_t}{\sigma_t} (x - \mu_t)
+$$
+
+For the trajectories to be straight lines, the velocity of any particle must be
+constant in time. Let's analyze the velocity of a particle $x_t$. We can write
+$x_t$ using the reparameterization trick as $x_t = \mu_t + \sigma_t \epsilon$,
+where $\epsilon \sim \mathcal{N}(0, I)$ is fixed for the particle. Substituting
+this into the velocity field:
+
+$$
+v_t(x_t) = \dot{\mu}_t + \frac{\dot{\sigma}_t}{\sigma_t} (\mu_t + \sigma_t \epsilon - \mu_t) = \dot{\mu}_t + \dot{\sigma}_t \epsilon
+$$
+
+For the trajectory $x_t$ to be a straight line, this velocity $v_t(x_t)$ must be
+constant for all $t$. Since this must hold for _any_ particle (any $\epsilon$),
+both terms must be constant independently:
+
+1.  $\dot{\mu}_t = \text{const} \implies \mu_t$ is linear in $t$.
+2.  $\dot{\sigma}_t = \text{const} \implies \sigma_t$ is linear in $t$.
+
+The standard linear interpolation $x_t = (1-t)x_0 + t x_1$ satisfies the first
+condition (linear mean) but fails the second. As we saw, the variance
+$\sigma_t^2 = (1-t)^2 \sigma_0^2 + t^2 \sigma_1^2$ is convex, meaning $\sigma_t$
+is not linear (unless $\sigma_0 = \sigma_1$).
+
+To achieve straight trajectories, we essentially need the particles to move at
+constant velocity. For Gaussian distributions, this implies that both the mean
+$\mu_t$ and the standard deviation $\sigma_t$ must evolve linearly in time:
+
+$$
+\mu_t = (1-t)\mu_0 + t\mu_1
+$$
+
+$$
+\sigma_t = (1-t)\sigma_0 + t\sigma_1
+$$
+
+Can we achieve this with a schedule of the form
+$x_t = \alpha_t x_1 + \beta_t x_0$?
+
+The conditions on the schedule become:
+
+1. $\alpha_t \mu_1 + \beta_t \mu_0 = \mu_t$
+2. $\alpha_t^2 \sigma_1^2 + \beta_t^2 \sigma_0^2 = \sigma_t^2$
+
+If $\mu_0$ and $\mu_1$ are linearly independent (which is the case if the origin
+does not lie on the line connecting them), the first equation is a vector
+equation that uniquely determines the coefficients: it forces $\alpha_t = t$ and
+$\beta_t = 1-t$. This leaves no degrees of freedom to satisfy the second
+equation (variance), which, as we saw, fails for the linear schedule.
+
+**Why does it depend on the coordinate system?** The interpolation formula
+$x_t = \alpha_t x_1 + \beta_t x_0$ is not affine-invariant unless
+$\alpha_t + \beta_t = 1$. When we relax this condition to satisfy the variance
+constraint, the specific values of $x_0$ and $x_1$ (and thus the origin
+location) matter.
+
+However, if we choose a coordinate system where the origin lies on the line
+passing through $\mu_0$ and $\mu_1$ (making them collinear/dependent), the
+vector constraint on the mean degrades into a single scalar constraint. This
+provides an extra degree of freedom, allowing us to find a non-linear schedule
+$(\alpha_t, \beta_t)$ that satisfies both:
+
+1.  The mean moves linearly along the line.
+2.  The variance evolves linearly
+    ($\alpha_t^2 \sigma_1^2 + \beta_t^2 \sigma_0^2 = ((1-t)\sigma_0 + t\sigma_1)^2$).
+
+Thus, straight trajectories for independent couplings with different variances
+are possible, but they require a constructive schedue defined relative to the
+specific geometry of the means.

@@ -1,0 +1,38 @@
+---
+import BibTexToggle from "./BibTexToggle.jsx";
+
+const { title, author, pubDate, url, slug } = Astro.props;
+
+const date = new Date(pubDate);
+const year = date.getFullYear();
+const month = date.toLocaleString("default", { month: "short" });
+const volume = date.getMonth() + 1;
+
+// Create a citation key: AuthorLastName + Year + FirstWordOfTitle
+const authorLastName = author.split(" ").pop().toLowerCase();
+const titleWord = title
+  .split(" ")[0]
+  .toLowerCase()
+  .replace(/[^a-z0-9]/g, "");
+const citationKey = `${authorLastName}${year}${titleWord}`;
+
+const bibtex = `@misc{${citationKey},
+    title = {${title}},
+    author = {${author}},
+    year = {${year}},
+    month = {${month}},
+    note = {Blog post},
+    howpublished = {\\url{${url}}}
+}`;
+---
+
+<div
+  class="mt-12 pt-8 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)]"
+>
+  <h3
+    class="text-sm font-bold uppercase tracking-wider text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] mb-4"
+  >
+    Cite this post
+  </h3>
+  <BibTexToggle client:load bibtex={bibtex} />
+</div>

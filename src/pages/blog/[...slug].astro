@@ -1,15 +1,16 @@
 ---
-import { getCollection } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
+import { getCollection } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import Citation from "../../components/Citation.astro";
 
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	return posts
-        .filter((post) => !post.data.draft)
-        .map((post) => ({
-            params: { slug: post.slug },
-            props: post,
-        }));
+  const posts = await getCollection("blog");
+  return posts
+    .filter((post) => !post.data.draft)
+    .map((post) => ({
+      params: { slug: post.slug },
+      props: post,
+    }));
 }
 
 const post = Astro.props;
@@ -17,36 +18,63 @@ const { Content } = await post.render();
 ---
 
 <Layout title={post.data.title} description={post.data.description}>
-	<article class="prose prose-lg dark:prose-invert max-w-[85ch] mx-auto font-serif text-justify leading-relaxed prose-headings:font-bold prose-headings:text-[var(--color-text)] dark:prose-headings:text-[var(--color-text-dark)] prose-a:text-[var(--color-primary)] dark:prose-a:text-[var(--color-primary-dark)] hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-lg">
-        <header class="mb-10 not-prose text-center">
-            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 font-sans text-[var(--color-text)] dark:text-[var(--color-text-dark)]">{post.data.title}</h1>
-            <div class="flex flex-col items-center gap-2 text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] font-mono text-sm uppercase tracking-wider">
-                <p>{post.data.author}</p>
-                <p>
-                    {post.data.pubDate.toLocaleDateString('en-us', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                    })}
-                </p>
-            </div>
-        </header>
-        <div class="blog-content">
-		    <Content />
-        </div>
+  <article
+    class="prose prose-lg dark:prose-invert max-w-[85ch] mx-auto font-serif text-justify leading-relaxed prose-headings:font-bold prose-headings:text-[var(--color-text)] dark:prose-headings:text-[var(--color-text-dark)] prose-a:text-[var(--color-primary)] dark:prose-a:text-[var(--color-primary-dark)] hover:prose-a:underline prose-img:rounded-xl prose-img:shadow-lg"
+  >
+    <header class="mb-10 not-prose text-center">
+      <h1
+        class="text-4xl md:text-5xl font-extrabold tracking-tight mb-4 font-sans text-[var(--color-text)] dark:text-[var(--color-text-dark)]"
+      >
+        {post.data.title}
+      </h1>
+      <div
+        class="flex flex-col items-center gap-2 text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)] font-mono text-sm uppercase tracking-wider"
+      >
+        <p>{post.data.author}</p>
+        <p>
+          {
+            post.data.pubDate.toLocaleDateString("en-us", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })
+          }
+        </p>
+      </div>
+    </header>
+    <div class="blog-content">
+      <Content />
+    </div>
 
-        {post.data.references && post.data.references.length > 0 && (
-            <div class="mt-16 pt-8 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
-                <h2 class="text-xl font-bold mb-4 font-sans uppercase tracking-wide text-[var(--color-text)] dark:text-[var(--color-text-dark)]">References</h2>
-                <ul class="list-none space-y-2 text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
-                    {post.data.references.map((ref, index) => (
-                        <li id={`ref-${index + 1}`} class="pl-8 -indent-8 scroll-mt-24 transition-colors duration-300 target:bg-yellow-50 dark:target:bg-yellow-900/20 target:rounded-lg target:p-2 target:-ml-2">
-                            <span class="font-mono text-xs text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] mr-2">[{index + 1}]</span>
-                            {ref}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        )}
-	</article>
+    {
+      post.data.references && post.data.references.length > 0 && (
+        <div class="mt-16 pt-8 border-t border-[var(--color-border)] dark:border-[var(--color-border-dark)]">
+          <h2 class="text-xl font-bold mb-4 font-sans uppercase tracking-wide text-[var(--color-text)] dark:text-[var(--color-text-dark)]">
+            References
+          </h2>
+          <ul class="list-none space-y-2 text-sm text-[var(--color-secondary)] dark:text-[var(--color-secondary-dark)]">
+            {post.data.references.map((ref, index) => (
+              <li
+                id={`ref-${index + 1}`}
+                class="pl-8 -indent-8 scroll-mt-24 transition-colors duration-300 target:bg-yellow-50 dark:target:bg-yellow-900/20 target:rounded-lg target:p-2 target:-ml-2"
+              >
+                <span class="font-mono text-xs text-[var(--color-primary)] dark:text-[var(--color-primary-dark)] mr-2">
+                  [{index + 1}]
+                </span>
+                {ref}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+
+    <Citation
+      title={post.data.title}
+      author={post.data.author}
+      pubDate={post.data.pubDate}
+      url={Astro.url.href}
+      slug={post.slug}
+    />
+  </article>
 </Layout>

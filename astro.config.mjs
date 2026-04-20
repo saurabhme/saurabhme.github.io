@@ -5,21 +5,21 @@ import tailwindcss from '@tailwindcss/vite';
 import mdx from '@astrojs/mdx';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
-import vercel from '@astrojs/vercel';
-import auth from 'auth-astro';
+// import vercel from '@astrojs/vercel';
+// import auth from 'auth-astro';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://www.saurabhsingh.info',
-  output: 'server',
-  adapter: vercel(),
+  // output: 'server',
+  // adapter: vercel(),
   integrations: [
     react(),
     mdx({
       remarkPlugins: [remarkMath],
       rehypePlugins: [rehypeKatex],
     }),
-    auth(),
+    // auth(),
   ],
   vite: {
     plugins: [tailwindcss()],
